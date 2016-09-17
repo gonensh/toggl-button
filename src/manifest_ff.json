@@ -1,7 +1,13 @@
 {
+  "applications": {
+    "gecko": {
+      "id": "some-options@mozilla.org",
+      "strict_min_version": "48.0a1"
+    }
+  },
   "name": "Toggl Button: Productivity & Time Tracker",
   "short_name": "Toggl Button",
-  "version": "1.0.6",
+  "version": "1.0.4",
   "manifest_version": 2,
   "description": "Puts a timer into any web tool and allows quick real time productivity tracking with all the data stored on your Toggl account",
   "background": {
@@ -26,10 +32,8 @@
     "48": "images/icon-48.png",
     "128": "images/icon-128.png"
   },
-  "options_page": "html/settings.html",
   "options_ui": {
-    "page": "html/settings.html",
-    "chrome_style": true
+      "page": "html/settings.html"
   },
   "permissions": [
     "*://*.toggl.com/*",
@@ -40,9 +44,7 @@
     "contextMenus",
     "notifications",
     "idle",
-    "tabs"
-  ],
-  "optional_permissions": [
+    "tabs",
     "*://*/"
   ]
 }
