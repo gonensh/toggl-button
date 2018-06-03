@@ -1,25 +1,26 @@
 {
   "applications": {
     "gecko": {
-      "id": "some-options@mozilla.org",
-      "strict_min_version": "48.0a1"
+      "id": "toggl-button@toggl.com",
+      "strict_min_version": "50.0"
     }
   },
   "name": "Toggl Button: Productivity & Time Tracker",
   "short_name": "Toggl Button",
-  "version": "1.0.4",
+  "version": "1.10.6",
   "manifest_version": 2,
   "description": "Puts a timer into any web tool and allows quick real time productivity tracking with all the data stored on your Toggl account",
   "background": {
     "scripts": [
-      "scripts/vendor/bugsnag-2.min.js",
-      "scripts/origins.js",
+      "scripts/vendor/bugsnag-3.min.js",
+      "scripts/lib.js",
       "scripts/db.js",
+      "scripts/ga.js",
       "scripts/background.js"
     ]
   },
-  "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
   "browser_action": {
+    "browser_style": false,
     "default_icon": {
       "19": "images/inactive-19.png",
       "38": "images/inactive-38.png"

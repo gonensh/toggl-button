@@ -10,12 +10,12 @@ function $(s, elem) {
   return elem.querySelector(s);
 }
 
-function createTag(name, className, innerHTML) {
+function createTag(name, className, textContent) {
   var tag = document.createElement(name);
   tag.className = className;
 
-  if (innerHTML) {
-    tag.innerHTML = innerHTML;
+  if (textContent) {
+    tag.textContent = textContent;
   }
 
   return tag;
@@ -104,7 +104,7 @@ var togglbutton = {
   currentDescription: "",
   fullPageHeight: getFullPageHeight(),
   fullVersion: "TogglButton",
-  render: function (selector, opts, renderer) {
+  render: function (selector, opts, renderer, mutationSelector) {
     chrome.runtime.sendMessage({type: 'activate'}, function (response) {
       if (response.success) {
         try {
@@ -115,13 +115,23 @@ var togglbutton = {
           togglbutton.duration_format = response.user.duration_format;
           if (opts.observe) {
             var observer = new MutationObserver(function (mutations) {
+              // If mutationSelector is defined, render the start timer link only when an element
+              // matching the selector changes.
+              // Multiple selectors can be used by comma separating them.
+              var matches = mutations.filter(function (mutation) {
+                return mutation.target.matches(mutationSelector);
+              });
+              if (!!mutationSelector && !matches.length) {
+                return;
+              }
+
               togglbutton.renderTo(selector, renderer);
             });
             observer.observe(document, {childList: true, subtree: true});
           }
           togglbutton.renderTo(selector, renderer);
         } catch (e) {
-          chrome.runtime.sendMessage({type: 'error', stack: e.stack});
+          chrome.runtime.sendMessage({type: 'error', stack: e.stack, category: 'Content'});
         }
       }
     });
@@ -182,9 +192,7 @@ var togglbutton = {
       ws = togglbutton.user.workspaces,
       premium;
 
-    if (pid === 0) {
-      pwid = togglbutton.user.default_wid;
-    } else {
+    if (pid !== 0) {
       project = togglbutton.findProjectByPid(pid);
       if (!project) {
         return;
@@ -201,16 +209,15 @@ var togglbutton = {
 
     togglbutton.toggleBillable(premium);
 
-    if (!no_overwrite && project.billable) {
+    if (!no_overwrite && (pid !== 0 && project.billable)) {
       togglbutton.$billable.classList.toggle("tb-checked", true);
     }
   },
 
   toggleBillable: function (visible) {
+    var tabIndex = visible ? "103" : "-1";
+    togglbutton.$billable.setAttribute("tabindex", tabIndex);
     togglbutton.$billable.classList.toggle("no-billable", !visible);
-    if (!visible) {
-      togglbutton.$billable.classList.toggle("tb-checked", visible);
-    }
   },
 
   setupBillable: function (billable, pid) {
@@ -227,6 +234,7 @@ var togglbutton = {
     var pid = response.entry.pid,
       tid = response.entry.tid,
       handler,
+      closeForm,
       position,
       editFormHeight = 350,
       editFormWidth = 240,
@@ -245,7 +253,8 @@ var togglbutton = {
       togglButtonDescription.value = response.entry.description || "";
 
       projectAutocomplete.setup(pid, tid);
-      tagAutocomplete.setup(response.entry.tags);
+      tagAutocomplete.setup(response.entry.tags, response.entry.wid);
+      togglbutton.setupBillable(!!response.entry.billable, pid);
 
       editForm.style.left = position.left + "px";
       editForm.style.top = position.top + "px";
@@ -265,9 +274,15 @@ var togglbutton = {
     projectAutocomplete = new ProjectAutoComplete("project", "li", togglbutton);
     tagAutocomplete = new TagAutoComplete("tag", "li", togglbutton);
 
+    closeForm = function () {
+      projectAutocomplete.closeDropdown();
+      tagAutocomplete.closeDropdown();
+      editForm.style.display = "none";
+    };
+
     handler = function (e) {
-      if (!/toggl-button/.test(e.target.className) && !/toggl-button/.test(e.target.parentElement.className)) {
-        editForm.style.display = "none";
+      if (!/toggl-button/.test(e.target.className) && !/toggl-button/.test(e.target.parentElement.className)) {
+        closeForm();
         this.removeEventListener("click", handler);
       }
     };
@@ -286,9 +301,7 @@ var togglbutton = {
           service: togglbutton.serviceName
         };
       chrome.runtime.sendMessage(request);
-      projectAutocomplete.closeDropdown();
-      tagAutocomplete.closeDropdown();
-      editForm.style.display = "none";
+      closeForm();
     };
 
     // Fill in data if edit form was not present
@@ -297,18 +310,23 @@ var togglbutton = {
     setCursorAtBeginning(togglButtonDescription);
     projectAutocomplete.setup(pid, tid);
     tagAutocomplete.setSelected(response.entry.tags);
+    tagAutocomplete.setWorkspaceId(response.entry.wid);
 
     togglbutton.setupBillable(!!response.entry.billable, pid);
 
     // Data fill end
     $("#toggl-button-hide", editForm).addEventListener('click', function (e) {
-      projectAutocomplete.closeDropdown();
-      tagAutocomplete.closeDropdown();
-      editForm.style.display = "none";
+      closeForm();
     });
 
     $("#toggl-button-update", editForm).addEventListener('click', function (e) {
       submitForm(this);
+    });
+
+    $("#toggl-button-update").addEventListener('keydown', function (e) {
+      if (e.code === "Enter" || e.code === "Space") {
+        submitForm(this);
+      }
     });
 
     $("form", editForm).addEventListener('submit', function (e) {
@@ -323,17 +341,45 @@ var togglbutton = {
       link.classList.remove('active');
       link.style.color = '';
       if (!link.classList.contains("min")) {
-        link.innerHTML = 'Start timer';
+        link.textContent = 'Start timer';
       }
       chrome.runtime.sendMessage({type: 'stop', respond: true}, togglbutton.addEditForm);
-      projectAutocomplete.closeDropdown();
-      tagAutocomplete.closeDropdown();
-      editForm.style.display = "none";
+      closeForm();
       return false;
     });
 
     togglbutton.$billable.addEventListener('click', function () {
       this.classList.toggle("tb-checked");
+    });
+
+    togglbutton.$billable.addEventListener('keydown', function (e) {
+      var prevent = false;
+      if (e.code === "Space") {
+        prevent = true;
+        this.classList.toggle("tb-checked");
+      }
+
+      if (e.code === "ArrowLeft") {
+        prevent = true;
+        this.classList.toggle("tb-checked", false);
+      }
+
+      if (e.code === "ArrowRight") {
+        prevent = true;
+        this.classList.toggle("tb-checked", true);
+      }
+
+      if (prevent) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    });
+
+    projectAutocomplete.onChange(function (selected) {
+      var project = togglbutton.findProjectByPid(selected.pid),
+        wid = project ? project.wid : response.entry.wid;
+
+      tagAutocomplete.setWorkspaceId(wid);
     });
 
     document.addEventListener("click", handler);
@@ -352,7 +398,7 @@ var togglbutton = {
       link.classList.remove('active');
       link.style.color = '';
       if (params.buttonType !== 'minimal') {
-        link.innerHTML = 'Start timer';
+        link.textContent = 'Start timer';
       }
     }
 
@@ -366,7 +412,7 @@ var togglbutton = {
       link.classList.add('active');
       link.style.color = '#1ab351';
       if (params.buttonType !== 'minimal') {
-        link.innerHTML = 'Stop timer';
+        link.textContent = 'Stop timer';
       }
     }
 
@@ -402,7 +448,8 @@ var togglbutton = {
           tags: invokeIfFunction(params.tags),
           projectName: invokeIfFunction(params.projectName),
           createdWith: togglbutton.fullVersion + "-" + togglbutton.serviceName,
-          service: togglbutton.serviceName
+          service: togglbutton.serviceName,
+          url: window.location.href
         };
       }
       togglbutton.element = e.target;
@@ -462,17 +509,28 @@ var togglbutton = {
         }
       }
       link.style.color = color;
-      link.innerHTML = linkText;
+      link.textContent = linkText;
     }
   },
 
   updateTrackedTimerLink: function () {
     var totalTime = $(".toggl-tracked"),
-      duration;
+      duration,
+      h3,
+      p;
 
     if (!!totalTime) {
       duration = togglbutton.calculateTrackedTime();
-      totalTime.innerHTML = "<h3>Time tracked</h3><p title='Time tracked with Toggl: " + duration + "'>" + duration + "</p>";
+
+      h3 = document.createElement("h3");
+      h3.textContent = "Time tracked";
+
+      p = document.createElement("p");
+      p.setAttribute("title", "Time tracked with Toggl: " + duration);
+      p.textContent = duration;
+
+      totalTime.appendChild(h3);
+      totalTime.appendChild(p);
     }
   },
 

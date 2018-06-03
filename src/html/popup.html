@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Toggl Button</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link rel="stylesheet" href="../styles/popup.css"/>
     <link rel="stylesheet" href="../styles/autocomplete.css"/>
   </head>
@@ -10,20 +11,26 @@
       <li class="icon" title="Open Toggl.com"></li>
       <li class="cog" title="Open Settings"></li>
       <li class="sync" title="Sync..."></li>
-      <li class="logout" title="Log out">Log out</li>
+      <li class="logout" title="Log out"></li>
+      <li class="signup" title="Create account"><a href="https://toggl.com/signup" target="_blank">Create account</a></li>
     </ul>
     <div class="error"></div>
     <div class="views">
 
       <ul id="menu" class="view">
         <li class="timer">
-          <div class="project-bullet"></div>
+          <div class="tb-project-bullet"></div>
           <div class="edit-button"></div>
           <div class="tag-icon"></div>
           <div class="billable-icon" title="billable"></div>
           <div class="stop-button">Stop</div>
           <div class="resume-button" data-event="resume">Continue latest</div>
         </li>
+        <li class="summary">
+          <div class="s-today">Today: <span>0h 00min</span></div>
+          <div class="s-week">This Week: <span>0h 00m</span></div>
+        </li>
+        <li class="entries-list"></li>
       </ul>
 
       <div id="login-form" class="view">

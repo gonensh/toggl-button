@@ -45,7 +45,7 @@ togglbutton.render('.items_wrapper .item > .content:not(.toggl)', {observe: true
   link = togglbutton.createTimerLink({
     className: 'basecamphq',
     description: elem.querySelector('span.content > span').textContent.trim(),
-    projectName: (!!$(".project")) ? ($(".project > title") || $(".project > header > h1 > a")).innerHTML : ""
+    projectName: (!!$(".project")) ? ($(".project > title") || $(".project > header > h1 > a")).textContent : ""
   });
 
   link.setAttribute('data-behavior', '');
@@ -65,17 +65,13 @@ togglbutton.render('.items_wrapper .item > .content:not(.toggl)', {observe: true
 // Basecamp 3
 togglbutton.render('.todos li.todo:not(.toggl):not(.completed)', {observe: true}, function (elem) {
   var link, project,
-    projectItem,
-    description = $('.checkbox__content', elem);
+    description,
+    parent = $('.checkbox__content', elem);
 
-  if (!description) {
-    return;
-  }
 
-  description = description.childNodes[1].textContent;
-  project = $('.checkbox__content', elem).parentNode.parentNode.parentNode.parentNode.parentNode;
-  projectItem = $('.todolist__permalink', project);
-  project = projectItem ? projectItem.textContent : "";
+  description = parent.childNodes[1].textContent.trim();
+  project = $('#a-breadcrumb-menu-button');
+  project = project ? project.textContent : "";
 
   link = togglbutton.createTimerLink({
     className: 'basecamp3',
@@ -83,5 +79,5 @@ togglbutton.render('.todos li.todo:not(.toggl):not(.completed)', {observe: true}
     projectName: project
   });
 
-  $('.todo_assignee', elem).appendChild(link);
+  parent.appendChild(link);
 });

@@ -5,14 +5,13 @@
 
 togglbutton.render('.issue-details .detail-page-description:not(.toggl)', {observe: true}, function (elem) {
   var link, description,
-    numElem = $(".identifier"),
+    numElem = $(".identifier") || $(".breadcrumbs-list li:last-child .breadcrumbs-sub-title"),
     titleElem = $(".title", elem),
-    projectElem = $("h1 .project-item-select-holder");
-
+    projectElem = $(".title .project-item-select-holder") || $(".breadcrumbs-list li:nth-last-child(3) .breadcrumb-item-text"),
+    actionsElem = $(".detail-page-header-actions");
   description = titleElem.textContent.trim();
-
   if (numElem !== null) {
-    description = numElem.innerText.split(" ").pop().trim() + " " + description;
+    description = numElem.textContent.split(" ").pop().trim() + " " + description;
   }
 
   link = togglbutton.createTimerLink({
@@ -21,18 +20,20 @@ togglbutton.render('.issue-details .detail-page-description:not(.toggl)', {obser
     projectName: projectElem.textContent
   });
 
-  $(".detail-page-header").appendChild(link);
+  actionsElem.parentElement.insertBefore(link, actionsElem);
 });
 
 togglbutton.render('.merge-request-details .detail-page-description:not(.toggl)', {observe: true}, function (elem) {
   var link, description,
-    numElem = $(".identifier"),
+    numElem = $(".identifier") || $(".breadcrumbs-list li:last-child .breadcrumbs-sub-title"),
     titleElem = $(".title", elem),
-    projectElem = $("h1 .project-item-select-holder");
+    projectElem = $(".title .project-item-select-holder") || $(".breadcrumbs-list li:nth-last-child(3) .breadcrumb-item-text"),
+    actionsElem = $(".detail-page-header-actions");
 
   description = titleElem.textContent.trim();
+
   if (numElem !== null) {
-    description = "MR" + numElem.innerText.split(" ").pop().trim().replace("!", "") + "::" + description;
+    description = "MR" + numElem.textContent.split(" ").pop().trim().replace("!", "") + "::" + description;
   }
 
   link = togglbutton.createTimerLink({
@@ -41,6 +42,6 @@ togglbutton.render('.merge-request-details .detail-page-description:not(.toggl)'
     projectName: projectElem.textContent
   });
 
-  $(".detail-page-header").appendChild(link);
+  actionsElem.parentElement.insertBefore(link, actionsElem);
 });
 

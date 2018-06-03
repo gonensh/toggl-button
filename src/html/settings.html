@@ -19,8 +19,8 @@
         <div class="guide">
 
           <div data-id="1">
-            <b>Welcome to Toggl Button 1.0!</b></br>
-            <p><i>This new settings tab allows to enable/disable integrations and define custom domains.</i>
+            <b>Welcome to Toggl Button!</b></br>
+            <p><i>This Permissions settings tab allows to enable/disable integrations and define custom domains.</i>
             </p>
             <p>
               You can enable all integrations you want to use with the Toggl Button by clicking the "Enable all" button under "Url Permissions". Also you can pick the tools you want by ticking the checkboxes.
@@ -29,7 +29,7 @@
           </div>
 
           <div data-id="2">
-            <b>Welcome to Toggl Button 1.0!</b></br>
+            <b>Welcome to Toggl Button!</b></br>
             <p><i>The Permissions tab allows you to enable/disable integrations and define custom domains.</i></p>
             <p>
               You can enable/disable all tools you by clicking the buttons on top of the list. Also you can pick the tools you want by ticking the checkbox in front of them.
@@ -38,9 +38,10 @@
           </div>
 
           <div data-id="3">
-            <b>Hey Toggler!</b><br>
-            <p>It seems you haven't enabled any integrations yet! You can enable all tools by clicking the "Enable all" button under "Url Permissions". Also you can pick the tools you want by ticking the checkbox in front of them.</p>
-            <p>You can also define custom domains in the second section of the page. Just type in the domain address, select the tool you are running on it and press "Add"</p>
+            <b>Enable integrations!</b><br>
+            <p>Hey Toggler! We have a ton of integrations that make your time tracking life easier, faster &amp; way more convenient.</p>
+            <p>To use them, check off any integrations you'd like to enable under "URL Permissions" -- or click enable all.</p>
+            <p>You can also define custom domains on the second part of the page. Type in an address, select the tool and press "Add".</p>
           </div>
 
           <input type="checkbox" id="disable-permission-notice">
@@ -55,9 +56,18 @@
           <ul class="list">
             <li>
               <label for="default-project">Default Project</label>
-              <select id="default-project" name="default-project">
-              </select>
+              <div id="default-project-container">
+              </div>
               <div class="description">The default project will be selected when timer is started with no matched project</div>
+            </li>
+            <li>
+              <label for="remember-project-per">Remember project per</label>
+              <select id="remember-project-per">
+                <option value="false">Use global default</option>
+                <option value="service">Service</option>
+                <option value="url">URL</option>
+              </select>
+              <div class="description">This will remember the last project used on each service/url separately. Overrides default project.</div>
             </li>
             <li>
               <input type="checkbox" id="show_right_click_button">
@@ -67,7 +77,7 @@
             <li>
               <input type="checkbox" id="start_automatically">
               <label for="start_automatically">Start automatically</label>
-              <div class="description">Start time tracking of latest task when chrome starts</div>
+              <div class="description">Start time tracking of latest task when the browser starts</div>
             </li>
             <li>
               <input type="checkbox" id="stop_automatically">
@@ -121,12 +131,12 @@
           <ul class="list">
             <li class="pomodoro-mode">
               <input type="checkbox" id="pomodoro-mode">
-              <label for="pomodoro-mode">Enable Pomodoro mode</label>
+              <label for="pomodoro-mode">Enable Pomodoro Timer</label>
               <p class="description">Allows user to define Pomodoro Timer interval. Pomodoro timer starts running every time a time entry is started. At the end of the interval the user is shown notification to take a break.
                 User can set an option to stop or continue time tracking when pomodoro timer ends.</p>
               <div class="subsettings-details">
                 <p>
-                  <label for="pomodoro-interval">Length of Pomodoro time interval in minutes</label>
+                  <label for="pomodoro-interval">Pomodoro timer interval in minutes</label>
                   <input type="number" id="pomodoro-interval" min="1">
                 </p>
                 <p>
@@ -153,13 +163,13 @@
             <h2>Url Permissions</h2>
             <div class="permissions-toolbar" data-id="regular">
               <input type="text" id="permission-filter" placeholder="Filter permissions"/>
-              <a href="#clear" id="filter-clear">&times;</a>
+              <a href="javascript:void(0)" id="filter-clear">&times;</a>
               <div class="button-container">
                 <button class="enable-all">Enable all</button>
                 <button class="disable-all">Disable all</button>
               </div>
             </div>
-            <ul id="permissions-list" class="origin-list"></ul>
+            <div id="perm-container"></div>
             <p class="description">Enable tools you want to use with Toggl Button. You can enable all by clicking "Enable all" button in the top.</p>
           </div>
 
@@ -168,12 +178,12 @@
           <div class="section">
             <h2>Custom Domain Url Permissions</h2>
             <input type="text" id="new-permission" placeholder="custom domain url"/>
-            <select id="origins"></select>
+            <div id="origins-container"></div>
             <p class="description">Define custom domains here. Just type in the domain name without http(s) in format "toggl.com" and select the integration from dropdown. Ports are currently not supported.</p>
             <button id="add-permission">Add</button>
             <div class="permissions-toolbar" data-id="custom">
             </div>
-            <ul id="custom-permissions-list" class="origin-list"></ul>
+            <div id="custom-perm-container"></div>
           </div>
         </div>
       </div>
@@ -182,7 +192,6 @@
       Version <span id="version"></span>
       <p class="changelog">Changelog: <a href="http://toggl.github.io/toggl-button">http://toggl.github.io/toggl-button</a></p>
     </div>
-    <script src="../scripts/origins.js"></script>
     <script src="../scripts/settings.js"></script>
   </body>
 </html>
