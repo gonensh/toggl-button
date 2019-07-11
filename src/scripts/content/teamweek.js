@@ -1,19 +1,17 @@
-/*jslint indent: 2 */
-/*global $: false, document: false, togglbutton: false*/
-
 'use strict';
 
-togglbutton.render('.timeline-form:not(.toggl)', {observe: true}, function (element) {
-  var titleElement = $('[data-hook=input-name]', element),
-    projectElement = $('[name=project_name]', element),
-    container = $('[data-hook=row-actions]', element),
-    link;
+togglbutton.render('.timeline-form:not(.toggl)', { observe: true }, function (
+  element
+) {
+  const titleElement = $('[data-hook=input-name]', element);
+  const projectElement = $('[name=project_name]', element);
+  const container = $('[data-hook=row-actions]', element);
 
   if (titleElement === null || container === null) {
     return;
   }
 
-  link = togglbutton.createTimerLink({
+  const link = togglbutton.createTimerLink({
     className: 'teamweek-new',
     buttonType: 'minimal',
     description: titleElement.value,

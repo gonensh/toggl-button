@@ -1,20 +1,21 @@
-/*jslint indent: 2 */
-/*global $: false, document: false, togglbutton: false, createTag:false*/
-
 'use strict';
 
-togglbutton.render('.taskItem-body:not(.toggl)', { observe: true }, function (elem) {
-  var link,
-    container = createTag('a', 'taskItem-toggl'),
-    titleElem = $('.taskItem-title', elem),
-    projectTitleElem = $('.taskItemInfo-title', elem),
-    activeList = $('ul.lists .listItem.active'),
-    activeListTitle = $('.listItem-title', activeList),
-    projectTitle = projectTitleElem ?
-        projectTitleElem.textContent :
-        (activeListTitle ? activeListTitle.textContent : '');
+togglbutton.render('.taskItem-body:not(.toggl)', { observe: true }, function (
+  elem
+) {
+  const container = createTag('a', 'taskItem-toggl');
+  const titleElem = $('.taskItem-title', elem);
+  const projectTitleElem = $('.taskItemInfo-title', elem);
+  const activeList = $('ul.lists .listItem.active');
+  const activeListTitle = $('.listItem-title', activeList);
 
-  link = togglbutton.createTimerLink({
+  const projectTitle = projectTitleElem
+    ? projectTitleElem.textContent
+    : activeListTitle
+      ? activeListTitle.textContent
+      : '';
+
+  const link = togglbutton.createTimerLink({
     className: 'microsoft-todo',
     buttonType: 'minimal',
     description: titleElem.textContent,
@@ -22,5 +23,5 @@ togglbutton.render('.taskItem-body:not(.toggl)', { observe: true }, function (el
   });
 
   container.appendChild(link);
-  elem.appendChild(container);
+  elem.insertBefore(container, elem.lastElementChild);
 });

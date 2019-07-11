@@ -1,23 +1,24 @@
-/*jslint indent: 2 */
-/*global $: false, document: false, togglbutton: false, window: false*/
 'use strict';
 
-/*workitems / tasks view */
-togglbutton.render('.edit-container:not(.toggl)', {observe: true}, function (elem) {
-  var link,
-    titleEl = $('.header-title-container', elem),
-    number = $('.token-number', titleEl).textContent,
-    subject = $('.vk-editableText span', titleEl).textContent,
-    descriptionFunc = function () {
-      var task = $('.first-panel .vk-accordion-title', elem),
-        taskText = task ? " - " + task.textContent : "",
-        description = number + subject + taskText;
+/* workitems / tasks view */
+togglbutton.render('.edit-container:not(.toggl)', { observe: true }, function (
+  elem
+) {
+  const titleEl = $('.header-title-container', elem);
+  const number = $('.token-number', titleEl).textContent;
+  const subject = $('.vk-editableText span', titleEl).textContent;
 
-      return description;
-    },
-    project = $('#miAppsPopover').textContent;
+  const descriptionFunc = function () {
+    const task = $('.first-panel .vk-accordion-title', elem);
+    const taskText = task ? ' - ' + task.textContent : '';
+    const description = number + subject + taskText;
 
-  link = togglbutton.createTimerLink({
+    return description;
+  };
+
+  const project = $('#miAppsPopover').textContent;
+
+  const link = togglbutton.createTimerLink({
     className: 'heflo',
     description: descriptionFunc,
     projectName: project
@@ -26,24 +27,32 @@ togglbutton.render('.edit-container:not(.toggl)', {observe: true}, function (ele
   $('.header-btn-container', elem).appendChild(link);
 });
 
-/*process editor view */
-togglbutton.render('.vk-mainDiagram:not(.toggl)', {observe: true}, function () {
-  var link,
-    liTag = document.createElement("li"),
-    descriptionFunc = function () {
+/* process editor view */
+togglbutton.render(
+  '.vk-mainDiagram:not(.toggl)',
+  { observe: true },
+  function () {
+    const liTag = document.createElement('li');
+
+    const descriptionFunc = function () {
       return window.document.title;
-    },
-    project = $('#miAppsPopover').textContent,
-    lastEl = $('.navbar-nav');
+    };
 
-  liTag.className = "navbar-right toggl-container";
+    const project = $('#miAppsPopover').textContent;
+    const lastEl = $('.navbar-nav');
 
-  link = togglbutton.createTimerLink({
-    className: 'heflo',
-    description: descriptionFunc,
-    projectName: project
-  });
+    liTag.className = 'navbar-right toggl-container';
 
-  liTag.appendChild(link);
-  lastEl.insertBefore(liTag, lastEl.querySelector(".navbar-save-button").nextSibling);
-});
+    const link = togglbutton.createTimerLink({
+      className: 'heflo',
+      description: descriptionFunc,
+      projectName: project
+    });
+
+    liTag.appendChild(link);
+    lastEl.insertBefore(
+      liTag,
+      lastEl.querySelector('.navbar-save-button').nextSibling
+    );
+  }
+);
